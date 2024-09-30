@@ -10,7 +10,8 @@ const createCard = function (name, link) {
 
   cardElement.querySelector('.card__title').textContent = name;
   cardElement.querySelector('.card__image').src = link;
-  cardElement.querySelector('.card__image').textContent = 'alt';
+  // cardElement.querySelector('.card__image').textContent = 'alt';
+  cardElement.querySelector('.card__image').setAttribute("alt",name);
   
   cardElement.querySelector('.card__delete-button').addEventListener('click', deleteButtonFunction);
    
@@ -26,6 +27,6 @@ const deleteButtonFunction = function (event) {
 
 initialCards.forEach((el)=> {
 
-  placesList.appendChild(createCard(el.name, el.link));
+  placesList.append(createCard(el.name, el.link));
 
 });
