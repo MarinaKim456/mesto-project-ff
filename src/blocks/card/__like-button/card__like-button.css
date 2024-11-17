@@ -18,3 +18,19 @@
 .card__like-button:hover {
   opacity: 0.6;
 }
+.like-area {
+  display: flex;
+  flex-direction: column;
+}
+.like-count {
+  font-size: 18px;
+  text-align: center;
+}
+
+/* const likeButton = document.querySelector('.like-button');
+const likeCount = document.querySelector('.like-count');
+likeButton.addEventListener('click', () => {
+  // Получаем текущее значение счётчика лайков и увеличиваем на 1
+  const currentCount = parseInt(likeCount.textContent, 10);
+  likeCount.textContent = currentCount + 1;
+}); */

@@ -1,4 +1,5 @@
 .profile__image {
+  position: relative;
   width: 120px;
   height: 120px;
   -webkit-border-radius: 50%;
@@ -7,6 +8,18 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  cursor: pointer;
+}
+
+.profile__image:hover::after {
+  content: '';
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  background-image: url('./../../../images/pen.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 120px;
+  height: 120px;
 }
 
 @media screen and (max-width: 740px) {
@@ -18,5 +31,12 @@
 @media screen and (max-width: 480px) {
   .profile__image {
     margin-right: 0;
+  }
+
+  .profile__image:hover::after {
+    left: 0px;
+    background-repeat: no-repeat;
+    width: 120px;
+    height: 120px;
   }
 }
