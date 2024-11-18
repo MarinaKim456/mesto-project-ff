@@ -1,9 +1,3 @@
-export const clearValidation = (formElement, formInput, buttonElement) =>{
-  hideInputError(formElement, formInput);
-  buttonElement.disabled = false;
-  buttonElement.classList.remove('popup__button_disabled');
-}; 
-
   const showInputError = (formElement, formInput, errorMessage) => {
     const errorElement = formElement.querySelector(`.${formInput.id}-error`);
     formInput.classList.add('popup__input-error');

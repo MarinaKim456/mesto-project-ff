@@ -3,11 +3,13 @@ import {forEach} from "core-js/actual/array";
 import {createCard} from './components/card.js'
 import {openPopup, closePopup} from './components/modal.js';
 import {enableValidation, clearValidation} from './components/validation.js';
-import {getUserInfo, avatarRequest, getCardsRequest, getNewCardRequest, deleteCardRequest, updateProfileInfoRequest } from './scripts/api.js'
+import {getUserInfo, avatarRequest, getCardsRequest, getNewCardRequest, updateProfileInfoRequest } from './scripts/api.js'
 
 //список карточек
 const placesList = document.querySelector('.places__list'); 
+//попап увеличенного изображения
 const popupTypeImage = document.querySelector('.popup_type_image');
+//попап добавления новой карточки
 const addCard = document.querySelector('.popup_type_new-card');
 //кнопка редактирования профиля
 const popupEditOpener = document.querySelector('.profile__edit-button');
@@ -26,8 +28,8 @@ const popupClosers = document.querySelectorAll('.popup__close');
 //кнопка удаления карточки
 export const deleteButton  = document.querySelector('.card__delete-button');
 
+//попапы редактирования форм
 export const formElement = document.querySelector('.popup__form');
-//попап редактирования профиля
 const editProfile = document.querySelector('.popup_type_edit');
 const cardForm = document.forms['new-place'];
 const avatarForm = document.forms['new-avatar'];
@@ -40,11 +42,6 @@ const inputName = document.querySelector('.popup__input_type_card-name');
 const inputLink = document.querySelector('.popup__input_type_url');
 // export const myId = '3632a5461a46f16a9de1aa57'
 export let myId = null;
-
-const validationConfig = {
-  formElement: '.popup__form',
-  formInput: '.popup__input',
-}
 
 const loading = {
   start: btn => btn.textContent = 'Сохранение...',
@@ -71,7 +68,6 @@ avatarForm.addEventListener('submit', function(evt){
   })
   .finally(()=>{
     loading.stop(evt.submitter);
-    // clearValidation(evt.target, )
     formElement.reset();
     closePopup(popupUpdateAvatar);
   })
@@ -90,6 +86,7 @@ const popupProfile = () => {
   nameInput.value = name.textContent
   jobInput.value = job.textContent
   openPopup(editProfile);
+  // clearValidation(editProfile, validationConfig)
 };
 
 popupEditOpener.addEventListener('click', popupProfile);
@@ -185,8 +182,6 @@ function addCardFunc(evt){
     })
   };
 
-
-
 //обработчик подтверждения добавления карточки
 cardForm.addEventListener('submit', addCardFunc);
 //обработчик подтверждения редактирования профиля
@@ -214,26 +209,4 @@ const getInitialCards = (cards)=>{
   })
 };
 
-
-
-//!!!!!!!!!!!!!
-
-
-// очистка ошибок валидации вызовом clearValidation
-
-// clearValidation(editProfile, validationConfig) {  
-//   closePopup(editProfile);
-// }
-
-// clearValidation(profileForm, validationConfig); 
-// которая очищает ошибки валидации формы и делает кнопку неактивной. 
-// Эта функция должна принимать как параметры DOM-элемент формы, для которой очищаются 
-// ошибки валидации и объект с настройками валидации. Используйте функцию clearValidation 
-// при заполнении формы профиля 
-// во время её открытия и при очистке формы добавления карточки.
-// const container = document.forms["todo-list"];
-// const cards = initHandlers(placesList, "card-template");//"todo-item"//addCardFunc
-
-// function handleError(err) {
-//   console.log(`error ${err.code}: ${err.error}`);
-// }
+enableValidation()

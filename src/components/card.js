@@ -24,7 +24,7 @@ export const createCard = function (name, link, _id, ownerId, likes, openCardIma
     // deleteButton.addEventListener("click", () => {
     //   onDeleteCard(data._id, cardElement);
     // });
-    deleteButton.addEventListener("click", deleteCardForm)
+    // deleteButton.addEventListener("click", deleteCardForm)
 
     // если у карточки есть лайки, выводим количество и меняем состояние кнопки, если среди лайков есть наши
     if (likes){
