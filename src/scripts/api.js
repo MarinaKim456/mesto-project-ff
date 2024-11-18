@@ -67,9 +67,6 @@ export const getNewCardRequest = (cardData) => {
         body: JSON.stringify(cardData)
     })
     .then(handleResponse)
-    // .catch((err) => {
-    //   console.log(err); 
-    // });
 }
 
 export const putLikeRequest = (cardId) => {
@@ -78,9 +75,6 @@ export const putLikeRequest = (cardId) => {
         headers: config.headers,
     })
     .then(handleResponse)
-    // .catch((err) => {
-    //   console.log(err); 
-    // });
 }
 
 export const deleteLikeRequest = (cardId) => {

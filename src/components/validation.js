@@ -1,3 +1,12 @@
+export const clearValidation = (formElement, formInput) =>{
+  const errorElement = formElement.querySelector(`.${formInput.id}-error`);
+  formInput.classList.remove('popup__input-error');
+  console.log(formInput + "форма");
+  errorElement.classList.remove('form__input-error_active');
+  console.log(errorElement);
+  errorElement.textContent = '';
+}; 
+  
   const showInputError = (formElement, formInput, errorMessage) => {
     const errorElement = formElement.querySelector(`.${formInput.id}-error`);
     formInput.classList.add('popup__input-error');

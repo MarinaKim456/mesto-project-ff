@@ -1,7 +1,6 @@
 
-import {myId, popupConfirmDelete, formElement, deleteCardForm, deleteCardFunction} from './../index'
-import {putLikeRequest, deleteLikeRequest, deleteCardRequest} from './../scripts/api'
-// import {openPopup, closePopup} from './modal';
+import {myId, popupDelete} from './../index'
+import {putLikeRequest, deleteLikeRequest} from './../scripts/api'
 
 export const createCard = function (name, link, _id, ownerId, likes, openCardImage) {
   
@@ -20,11 +19,8 @@ export const createCard = function (name, link, _id, ownerId, likes, openCardIma
     //определяем хозяина карточки, если не мы, то удаляем иконку удаления
     if (ownerId !== myId) deleteButton.remove();
 
-    //удаление карточки
-    // deleteButton.addEventListener("click", () => {
-    //   onDeleteCard(data._id, cardElement);
-    // });
-    // deleteButton.addEventListener("click", deleteCardForm)
+    //вызов попапа удаления карточки
+    deleteButton.addEventListener("click", popupDelete);
 
     // если у карточки есть лайки, выводим количество и меняем состояние кнопки, если среди лайков есть наши
     if (likes){
@@ -63,10 +59,3 @@ export const createCard = function (name, link, _id, ownerId, likes, openCardIma
 
     return cardElement;
 }
-// export const deleteCardFunction = function (event) {
-//     const listItem = event.target.closest('.card');
-//     listItem.remove();
-//   };
-
-
-
