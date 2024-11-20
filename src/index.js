@@ -3,7 +3,7 @@ import {forEach} from "core-js/actual/array";
 import {createCard} from './components/card.js'
 import {openPopup, closePopup} from './components/modal.js';
 import {enableValidation, clearValidation} from './components/validation.js';
-import {getUserInfo, avatarRequest, getCardsRequest, getNewCardRequest, updateProfileInfoRequest } from './scripts/api.js'
+import {getUserInfo, updateAvatarRequest, getCardsRequest, createNewCardRequest, updateProfileInfoRequest, deleteLikeRequest, putLikeRequest } from './scripts/api.js'
 
 //список карточек
 const placesList = document.querySelector('.places__list'); 
@@ -42,6 +42,16 @@ const job = document.querySelector('.profile__description');
 const inputName = document.querySelector('.popup__input_type_card-name');
 const inputLink = document.querySelector('.popup__input_type_url');
 export let myId = null;
+let cardId = null;
+
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: 'popup__input',
+  submitButtonSelector: 'popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
 
 const loading = {
   start: btn => btn.textContent = 'Сохранение...',
@@ -49,20 +59,20 @@ const loading = {
 }
 
 //редактирование аватара
-const popupAvatar = () => {
+const openPopupAvatar = () => {
   openPopup(popupUpdateAvatar);
   avatarForm.reset();
-  clearValidation(avatarForm, popupAvatarUrl)
+  clearValidation(avatarForm, validationConfig)
 };
 
-profileImage.addEventListener('click', popupAvatar);
+profileImage.addEventListener('click', openPopupAvatar);
 
 avatarForm.addEventListener('submit', function(evt){
   loading.start(evt.submitter);
   evt.preventDefault();
-  avatarRequest(popupAvatarUrl.value)
-  .then(()=> {
-    profileImage.style.backgroundImage = "url('" + popupAvatarUrl.value + "')";
+  updateAvatarRequest(popupAvatarUrl.value)
+  .then((newUser)=> {
+    profileImage.style.backgroundImage = `url('${newUser.avatar}')`;
   })
   .catch((err) => {
     console.log('Ошибка: ', err);
@@ -74,15 +84,14 @@ avatarForm.addEventListener('submit', function(evt){
 });
 
 //попап редактирования профиля
-const popupProfile = () => {
+const openPopupProfile = () => {
   nameInput.value = name.textContent
   jobInput.value = job.textContent
   openPopup(editProfile);
-  clearValidation(editProfileForm, nameInput)
-  clearValidation(editProfileForm, jobInput)
+  clearValidation(editProfileForm, validationConfig)
 };
 
-popupEditOpener.addEventListener('click', popupProfile);
+popupEditOpener.addEventListener('click', openPopupProfile);
 
 //редактирование профиля
 const updateUserInfo = (user)=>{
@@ -118,29 +127,33 @@ export const openCardImage = (e)=>{
 };
 
 //попап добавления новой карточки
-const popupCard = () => {
+const openPopupCard = () => {
   openPopup(addCard);
   cardForm.reset();
-  clearValidation(cardForm, inputName)
-  clearValidation(cardForm, inputLink)
+  clearValidation(cardForm, validationConfig)
 };
-popupAddOpener.addEventListener('click', popupCard);
+popupAddOpener.addEventListener('click', openPopupCard);
 
 // добавление новой карточки
 function addCardFunc(evt){
   loading.start(evt.submitter);
   evt.preventDefault();
-    getNewCardRequest ({
+  createNewCardRequest ({
       name: inputName.value,
       link: inputLink.value,
     })
       .then((newCardData) => {
+        cardId = newCardData._id;
+        
         createCard({
           name: newCardData.name,
           link: newCardData.link,
-          id: newCardData._id,
+          cardId: newCardData._id,
           ownerId: newCardData.owner._id,
+          myId: myId,
           likes: newCardData.likes,
+          openCardImage: openCardImage,
+          openPopupDelete: openPopupDelete,
         })
       })
     .then((card) =>{
@@ -152,11 +165,13 @@ function addCardFunc(evt){
     .finally(()=>{
       loading.stop(evt.submitter);
       closePopup(addCard);
-      console.log(evt.submitter);
     })
   };
+
+
+
 //попап удаления карточки
-export const popupDelete = () => {
+export const openPopupDelete = () => {
   openPopup(popupConfirmDelete);
 };
 
@@ -179,17 +194,17 @@ Promise.all([getUserInfo(), getCardsRequest()])
   .then(([user, cards])=>{
     myId = user._id;
     updateUserInfo(user);
-    getInitialCards(cards);
+    showInitialCards(cards);
 })
   .catch((err) => {
     console.log('Ошибка. Запрос не выполнен: ', err);
 })
 
 //вывод карточек одногруппников
-const getInitialCards = (cards)=>{
+const showInitialCards = (cards)=>{
   cards.forEach((el)=>{
-    placesList.append(createCard(el.name, el.link, el._id, el.owner._id, el.likes, openCardImage));
+    placesList.append(createCard(el.name, el.link, el._id, el.owner._id, myId, el.likes, openCardImage, openPopupDelete));
   })
 };
 
-enableValidation()
+enableValidation(validationConfig)

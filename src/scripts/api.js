@@ -30,13 +30,13 @@ const config = {
 
   export const getUserInfo = () =>{
     return fetch(`${config.baseUrl}/users/me`, {
-      method: 'PATCH',
+      method: 'GET',
       headers: config.headers,
-      body: JSON.stringify({
-        name: 'Marina Kim',
-        about: 'junior frontend developer',
-        avatar: 'https://i.pinimg.com/originals/00/52/5c/00525c50c5b947a61ffccddaada2d663.jpg'
-      }),
+      // body: JSON.stringify({
+        // name: 'Marina Kim',
+        // about: 'junior frontend developer',
+        // avatar: 'https://i.pinimg.com/originals/00/52/5c/00525c50c5b947a61ffccddaada2d663.jpg'
+      // }),
     })
     .then(handleResponse)
   }
@@ -49,7 +49,7 @@ const config = {
     .then(handleResponse);
   };
   
-  export const avatarRequest = (avatarLink) => {  
+  export const updateAvatarRequest = (avatarLink) => {  
     return fetch(`${config.baseUrl}/users/me/avatar`, {
       method: 'PATCH',
       headers: config.headers,
@@ -60,7 +60,7 @@ const config = {
       .then(handleResponse);
   };
   
-export const getNewCardRequest = (cardData) => {
+export const createNewCardRequest = (cardData) => {
     return fetch(`${config.baseUrl}/cards`, {
         method: 'POST',
         headers: config.headers,
