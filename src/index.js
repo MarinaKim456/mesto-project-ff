@@ -3,7 +3,7 @@ import {forEach} from "core-js/actual/array";
 import {createCard} from './components/card.js'
 import {openPopup, closePopup} from './components/modal.js';
 import {enableValidation, clearValidation} from './components/validation.js';
-import {getUserInfo, updateAvatarRequest, getCardsRequest, createNewCardRequest, updateProfileInfoRequest, deleteLikeRequest, putLikeRequest } from './scripts/api.js'
+import {getUserInfo, updateAvatarRequest, getCardsRequest, createNewCardRequest, updateProfileInfoRequest, deleteLikeRequest, putLikeRequest, deleteCardRequest } from './scripts/api.js'
 
 //список карточек
 const placesList = document.querySelector('.places__list'); 
@@ -42,7 +42,6 @@ const job = document.querySelector('.profile__description');
 const inputName = document.querySelector('.popup__input_type_card-name');
 const inputLink = document.querySelector('.popup__input_type_url');
 export let myId = null;
-let cardId = null;
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -104,10 +103,14 @@ const updateUserInfo = (user)=>{
 function handleProfileFormSubmit(evt) {
   loading.start(evt.submitter);
   evt.preventDefault();
-  updateProfileInfoRequest()
-  .then((data) => {
-    name.textContent = data.name;
-    job.textContent = data.about;
+  const dataToSend ={
+    name: nameInput.value,
+    about: jobInput.value
+  }
+  updateProfileInfoRequest(dataToSend)
+  .then((newData) => {
+    name.textContent = newData.name;
+    job.textContent = newData.about;
   })
   .catch((err) => {
     console.log('Ошибка: ', err);
@@ -135,51 +138,59 @@ const openPopupCard = () => {
 popupAddOpener.addEventListener('click', openPopupCard);
 
 // добавление новой карточки
-function addCardFunc(evt){
-  loading.start(evt.submitter);
-  evt.preventDefault();
-  createNewCardRequest ({
-      name: inputName.value,
-      link: inputLink.value,
-    })
-      .then((newCardData) => {
-        cardId = newCardData._id;
-        
-        createCard({
-          name: newCardData.name,
-          link: newCardData.link,
-          cardId: newCardData._id,
-          ownerId: newCardData.owner._id,
-          myId: myId,
-          likes: newCardData.likes,
-          openCardImage: openCardImage,
-          openPopupDelete: openPopupDelete,
-        })
+  function addCardFunc(evt){
+    loading.start(evt.submitter);
+    evt.preventDefault();
+    createNewCardRequest ({
+        name: inputName.value,
+        link: inputLink.value,
       })
-    .then((card) =>{
-      placesList.prepend(card)
-    })
-    .catch((err) => {
-      console.log('Ошибка: ', err);
-    })
-    .finally(()=>{
-      loading.stop(evt.submitter);
-      closePopup(addCard);
-    })
-  };
-
-
-
-//попап удаления карточки
-export const openPopupDelete = () => {
+        .then((newCardData) => {
+          const cardElement = createCard(
+            newCardData.name,
+            newCardData.link,
+            newCardData._id,
+            newCardData.owner._id,
+            myId,
+            newCardData.likes,
+            openCardImage,
+            handleDeleteCard,
+            likeFunction
+          );
+          console.log(cardElement);
+          loading.stop(evt.submitter);
+          closePopup(addCard);
+          placesList.prepend(cardElement)
+        })
+      .catch((err) => {
+        console.log('Ошибка: ', err);
+      });
+    } 
+//функция удаления карточки
+let cardForDelete = {}
+const handleDeleteCard = (cardId, cardElement) => {
+  cardForDelete = {
+    id: cardId,
+    cardElement
+  }
   openPopup(popupConfirmDelete);
 };
 
-//подтверждение удаления карточки
-deleteCardForm.addEventListener('submit', function(evt){
+const handleDeleteCardSubmit = (evt) => {
   evt.preventDefault();
-});
+ if (!cardForDelete.cardElement) return;
 
+ deleteCardRequest(cardForDelete.id)
+    .then(() => {
+      cardForDelete.cardElement.remove();
+      closePopup(popupConfirmDelete);
+      cardForDelete = {};
+    })
+    .catch((err) => {})
+};
+
+//подтверждение удаления карточки
+deleteCardForm.addEventListener('submit', handleDeleteCardSubmit);
 //обработчик подтверждения добавления карточки
 cardForm.addEventListener('submit', addCardFunc);
 //обработчик подтверждения редактирования профиля
@@ -203,8 +214,19 @@ Promise.all([getUserInfo(), getCardsRequest()])
 //вывод карточек одногруппников
 const showInitialCards = (cards)=>{
   cards.forEach((el)=>{
-    placesList.append(createCard(el.name, el.link, el._id, el.owner._id, myId, el.likes, openCardImage, openPopupDelete));
+    placesList.append(createCard(el.name, el.link, el._id, el.owner._id, myId, el.likes, openCardImage, handleDeleteCard, likeFunction));
   })
 };
+
+//постановка/удаление лайка
+function likeFunction (likeButton, {cardId, likeCount}) {
+  const likeMethod = likeButton.classList.contains('card__like-button_is-active') ? deleteLikeRequest : putLikeRequest;
+  likeMethod(cardId) 
+    .then((res) => {
+      likeButton.classList.toggle('card__like-button_is-active'); 
+      likeCount.textContent = res.likes.length;
+    })
+    .catch(err => console.log(err));
+}
 
 enableValidation(validationConfig)
